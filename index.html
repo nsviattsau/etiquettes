@@ -1,22 +1,22 @@
-   
+
 <!DOCTYPE html>
-<html lang="ru">
+<html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <title>Печать этикеток DataMatrix</title>
+  <title>Impression d'étiquettes DataMatrix</title>
 
-  <!-- DataMatrix generator. Everything is generated in the browser. -->
+  <!-- Génération DataMatrix côté navigateur -->
   <script src="https://cdn.jsdelivr.net/npm/bwip-js@4.11.1/dist/bwip-js-min.js"></script>
 
   <style>
     :root {
-      --label-width: 40mm;
-      --label-height: 25mm;
-      --barcode-size: 14mm;
-      --font-size: 9pt;
-      --gap: 2mm;
+      --label-width: 100mm;
+      --label-height: 30mm;
+      --matrix-size: 22mm;
+      --font-size: 18pt;
+      --gap: 0mm;
     }
 
     * {
@@ -25,8 +25,8 @@
 
     body {
       margin: 0;
-      font-family: Arial, sans-serif;
-      background: #f5f5f5;
+      font-family: Arial, Helvetica, sans-serif;
+      background: #f4f4f4;
       color: #222;
     }
 
@@ -63,12 +63,12 @@
       resize: vertical;
       border: 1px solid #ccc;
       border-radius: 8px;
-      font-family: Arial, sans-serif;
+      font-family: Arial, Helvetica, sans-serif;
     }
 
     .settings {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
       gap: 12px;
       margin-top: 14px;
     }
@@ -81,11 +81,12 @@
       color: #333;
     }
 
-    input[type="number"] {
+    input[type="number"], select {
       padding: 9px;
       border: 1px solid #ccc;
       border-radius: 8px;
       font-size: 15px;
+      background: white;
     }
 
     .checkbox-row {
@@ -146,45 +147,57 @@
       width: var(--label-width);
       height: var(--label-height);
       display: flex;
-      flex-direction: column;
+      flex-direction: row;
       align-items: center;
-      justify-content: center;
+      justify-content: flex-start;
       page-break-inside: avoid;
       break-inside: avoid;
       overflow: hidden;
       background: white;
-      border: 1px dashed #aaa;
-      padding: 1mm;
+      border: 1px dashed #999;
+      padding: 2mm 4mm;
     }
 
     .label.no-border {
       border: none;
     }
 
-    .label canvas {
-      width: var(--barcode-size);
-      height: var(--barcode-size);
+    .matrix {
+      width: var(--matrix-size);
+      height: var(--matrix-size);
+      min-width: var(--matrix-size);
+      min-height: var(--matrix-size);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .matrix canvas {
+      width: var(--matrix-size);
+      height: var(--matrix-size);
       display: block;
     }
 
     .code-text {
-      margin-top: 1.2mm;
-      max-width: calc(var(--label-width) - 3mm);
+      margin-left: 5mm;
       font-size: var(--font-size);
+      font-weight: 700;
       line-height: 1.1;
-      text-align: center;
-      word-break: break-all;
+      text-align: left;
+      word-break: break-word;
       color: #000;
+      flex: 1;
     }
 
     .empty-state {
       color: #666;
       padding: 20px;
       text-align: center;
+      width: 100%;
     }
 
     @page {
-      size: A4;
+      size: auto;
       margin: 0;
     }
 
@@ -227,63 +240,73 @@
 <body>
   <main class="app">
     <section class="panel controls">
-      <h1>Печать этикеток DataMatrix</h1>
+      <h1>Impression d'étiquettes DataMatrix</h1>
       <p class="hint">
-        Вставьте список кодов. Каждый код — с новой строки. Нажмите «Сгенерировать», затем «Печать».
+        Collez votre liste de codes. Un code par ligne. Le format de l'étiquette est :
+        <strong>[DataMatrix] [Code]</strong>.
       </p>
 
-      <textarea id="codesInput" placeholder="PN123456&#10;PN789012&#10;ABC-001"></textarea>
+      <textarea id="codesInput" placeholder="123&#10;PN123456&#10;ABC-001"></textarea>
 
       <div class="settings">
         <label>
-          Ширина этикетки, мм
-          <input id="labelWidth" type="number" min="10" max="150" step="1" value="40" />
+          Largeur étiquette, mm
+          <input id="labelWidth" type="number" min="10" max="200" step="1" value="100" />
         </label>
 
         <label>
-          Высота этикетки, мм
-          <input id="labelHeight" type="number" min="10" max="150" step="1" value="25" />
+          Hauteur étiquette, mm
+          <input id="labelHeight" type="number" min="10" max="100" step="1" value="30" />
         </label>
 
         <label>
-          Размер DataMatrix, мм
-          <input id="barcodeSize" type="number" min="5" max="80" step="1" value="14" />
+          Taille DataMatrix, mm
+          <input id="matrixSize" type="number" min="5" max="80" step="1" value="22" />
         </label>
 
         <label>
-          Размер текста, pt
-          <input id="fontSize" type="number" min="5" max="24" step="1" value="9" />
+          Taille du texte, pt
+          <input id="fontSize" type="number" min="6" max="40" step="1" value="18" />
         </label>
 
         <label>
-          Отступ между этикетками, мм
-          <input id="gapSize" type="number" min="0" max="20" step="1" value="2" />
+          Espace entre étiquettes, mm
+          <input id="gapSize" type="number" min="0" max="20" step="1" value="0" />
+        </label>
+
+        <label>
+          Qualité du DataMatrix
+          <select id="scaleValue">
+            <option value="3">Normale</option>
+            <option value="4" selected>Bonne</option>
+            <option value="5">Haute</option>
+          </select>
         </label>
       </div>
 
       <label class="checkbox-row">
         <input id="removeDuplicates" type="checkbox" checked />
-        Удалять повторы
+        Supprimer les doublons
       </label>
 
       <label class="checkbox-row">
         <input id="showBorders" type="checkbox" checked />
-        Показывать рамки в предпросмотре
+        Afficher les bordures en aperçu
       </label>
 
       <div class="buttons">
-        <button onclick="generateLabels()">Сгенерировать</button>
-        <button onclick="window.print()">Печать</button>
-        <button class="secondary" onclick="loadExample()">Пример</button>
-        <button class="danger" onclick="clearAll()">Очистить</button>
+        <button onclick="generateLabels()">Générer</button>
+        <button onclick="window.print()">Imprimer</button>
+        <button class="secondary" onclick="loadExample()">Exemple</button>
+        <button class="danger" onclick="clearAll()">Effacer</button>
       </div>
 
-      <div id="status" class="status">Этикетки ещё не сгенерированы.</div>
+      <div id="status" class="status">Aucune étiquette générée.</div>
     </section>
 
     <section class="print-area">
       <div id="labels" class="labels">
-        <div class="empty-state">Здесь появятся этикетки для печати.</div>
+        <div class="empty-state">Les étiquettes apparaîtront ici.</div>
       </div>
     </section>
   </main>
@@ -303,15 +326,15 @@
     }
 
     function applySettings() {
-      const width = document.getElementById("labelWidth").value || 40;
-      const height = document.getElementById("labelHeight").value || 25;
-      const barcode = document.getElementById("barcodeSize").value || 14;
-      const font = document.getElementById("fontSize").value || 9;
-      const gap = document.getElementById("gapSize").value || 2;
+      const width = document.getElementById("labelWidth").value || 100;
+      const height = document.getElementById("labelHeight").value || 30;
+      const matrix = document.getElementById("matrixSize").value || 22;
+      const font = document.getElementById("fontSize").value || 18;
+      const gap = document.getElementById("gapSize").value || 0;
 
       document.documentElement.style.setProperty("--label-width", width + "mm");
       document.documentElement.style.setProperty("--label-height", height + "mm");
-      document.documentElement.style.setProperty("--barcode-size", barcode + "mm");
+      document.documentElement.style.setProperty("--matrix-size", matrix + "mm");
       document.documentElement.style.setProperty("--font-size", font + "pt");
       document.documentElement.style.setProperty("--gap", gap + "mm");
     }
@@ -322,6 +345,7 @@
       const rawText = document.getElementById("codesInput").value;
       const removeDuplicates = document.getElementById("removeDuplicates").checked;
       const showBorders = document.getElementById("showBorders").checked;
+      const scaleValue = Number(document.getElementById("scaleValue").value || 4);
       const values = parseCodes(rawText, removeDuplicates);
 
       const container = document.getElementById("labels");
@@ -330,14 +354,17 @@
       container.innerHTML = "";
 
       if (values.length === 0) {
-        container.innerHTML = '<div class="empty-state">Введите хотя бы один код.</div>';
-        status.textContent = "Нет кодов для генерации.";
+        container.innerHTML = '<div class="empty-state">Veuillez saisir au moins un code.</div>';
+        status.textContent = "Aucun code à générer.";
         return;
       }
 
-      values.forEach((value, index) => {
+      values.forEach((value) => {
         const label = document.createElement("div");
         label.className = showBorders ? "label" : "label no-border";
+
+        const matrixBox = document.createElement("div");
+        matrixBox.className = "matrix";
 
         const canvas = document.createElement("canvas");
 
@@ -345,7 +372,8 @@
         text.className = "code-text";
         text.textContent = value;
 
-        label.appendChild(canvas);
+        matrixBox.appendChild(canvas);
+        label.appendChild(matrixBox);
         label.appendChild(text);
         container.appendChild(label);
 
@@ -353,31 +381,27 @@
           bwipjs.toCanvas(canvas, {
             bcid: "datamatrix",
             text: value,
-            scale: 4,
+            scale: scaleValue,
             paddingwidth: 0,
             paddingheight: 0,
             includetext: false
           });
         } catch (error) {
-          label.innerHTML = "";
-          const errorText = document.createElement("div");
-          errorText.className = "code-text";
-          errorText.textContent = "Ошибка: " + value;
-          label.appendChild(errorText);
-          console.error("DataMatrix generation error for:", value, error);
+          matrixBox.innerHTML = "";
+          text.textContent = "Erreur : " + value;
+          console.error("Erreur DataMatrix :", value, error);
         }
       });
 
-      status.textContent = "Сгенерировано этикеток: " + values.length;
+      status.textContent = "Étiquettes générées : " + values.length;
     }
 
     function loadExample() {
       document.getElementById("codesInput").value = [
+        "123",
         "PN123456",
-        "PN789012",
         "ABC-001",
-        "SACHET-001",
-        "BOITE-045"
+        "LOT-2026-001"
       ].join("\n");
 
       generateLabels();
@@ -385,11 +409,19 @@
 
     function clearAll() {
       document.getElementById("codesInput").value = "";
-      document.getElementById("labels").innerHTML = '<div class="empty-state">Здесь появятся этикетки для печати.</div>';
-      document.getElementById("status").textContent = "Этикетки ещё не сгенерированы.";
+      document.getElementById("labels").innerHTML = '<div class="empty-state">Les étiquettes apparaîtront ici.</div>';
+      document.getElementById("status").textContent = "Aucune étiquette générée.";
     }
 
-    ["labelWidth", "labelHeight", "barcodeSize", "fontSize", "gapSize", "showBorders"].forEach(id => {
+    [
+      "labelWidth",
+      "labelHeight",
+      "matrixSize",
+      "fontSize",
+      "gapSize",
+      "scaleValue",
+      "showBorders"
+    ].forEach(id => {
       document.getElementById(id).addEventListener("change", () => {
         if (document.getElementById("codesInput").value.trim().length > 0) {
           generateLabels();
