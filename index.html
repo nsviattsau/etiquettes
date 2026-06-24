@@ -444,6 +444,20 @@
       document.documentElement.style.setProperty("--text-weight", textBold ? "700" : "400");
     }
 
+    function updateMatrixPositionDefaults() {
+      const matrixPosition = document.getElementById("matrixPosition").value;
+    
+      if (matrixPosition === "left") {
+        document.getElementById("matrixLeft").value = 4;
+        document.getElementById("textLeft").value = 30;
+      } else {
+        document.getElementById("textLeft").value = 4;
+        document.getElementById("matrixLeft").value = 72;
+      }
+    
+      generateLabels();
+    }
+
     function generateLabels() {
       applySettings();
 
@@ -526,7 +540,6 @@
       "matrixTop",
       "matrixSize",
       "scaleValue",
-      "matrixPosition",
       "showBorders"
     ].forEach(id => {
       document.getElementById(id).addEventListener("change", () => {
