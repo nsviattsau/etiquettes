@@ -12,8 +12,9 @@
     :root {
       --label-width: 100mm;
       --label-height: 30mm;
+      --text-weight: 400;
 
-      /* Équivalent approximatif de votre ZPL 300 dpi :
+      /* Équivalent approximatif de ZPL 300 dpi :
          ^PW1181 = 100 mm
          ^LL354  = 30 mm
          ^FO30,120  -> 2.5 mm, 10.2 mm
@@ -178,7 +179,7 @@
       width: var(--text-width);
       font-family: Arial, Helvetica, sans-serif;
       font-size: var(--text-size);
-      font-weight: 400;
+      font-weight: var(--text-weight);
       line-height: 1;
       color: #000;
       white-space: nowrap;
@@ -336,6 +337,11 @@
         Afficher les bordures en aperçu
       </label>
 
+      <label class="checkbox-row">
+        <input id="textBold" type="checkbox" />
+        Texte en gras
+      </label>
+
       <div class="buttons">
         <button onclick="generateLabels()">Générer</button>
         <button onclick="window.print()">Imprimer</button>
@@ -403,18 +409,25 @@
       const matrixTop = Number(document.getElementById("matrixTop").value || 5.1);
       const matrixSize = Number(document.getElementById("matrixSize").value || 20);
       const matrixPosition = document.getElementById("matrixPosition").value;
+      const textBold = document.getElementById("textBold").checked;
 
-      let textLeft = textLeftInput;
-      let matrixLeft = matrixLeftInput;
-      let textWidth = Math.max(10, matrixLeft - textLeft - 2);
-
+      let textLeft;
+      let matrixLeft;
+      let textWidth;
+      
+      const gapBetweenMatrixAndText = 5;
+      
       if (matrixPosition === "left") {
+        // Position texte X becomes the start of the whole block:
+        // [DataMatrix] [Text]
         matrixLeft = textLeftInput;
-        textLeft = matrixLeft + matrixSize + 5;
+        textLeft = matrixLeft + matrixSize + gapBetweenMatrixAndText;
         textWidth = Math.max(10, labelWidth - textLeft - 2);
       } else {
-        matrixLeft = matrixLeftInput;
+        // Normal mode:
+        // [Text] [DataMatrix]
         textLeft = textLeftInput;
+        matrixLeft = matrixLeftInput;
         textWidth = Math.max(10, matrixLeft - textLeft - 2);
       }
 
@@ -427,6 +440,7 @@
       document.documentElement.style.setProperty("--matrix-left", matrixLeft + "mm");
       document.documentElement.style.setProperty("--matrix-top", matrixTop + "mm");
       document.documentElement.style.setProperty("--matrix-size", matrixSize + "mm");
+      document.documentElement.style.setProperty("--text-weight", textBold ? "700" : "400");
     }
 
     function generateLabels() {
@@ -506,6 +520,7 @@
       "textLeft",
       "textTop",
       "textSize",
+      "textBold",
       "matrixLeft",
       "matrixTop",
       "matrixSize",
