@@ -550,7 +550,11 @@
         }
       });
     });
-
+    
+    document.getElementById("matrixPosition").addEventListener("change", () => {
+      updateMatrixPositionDefaults();
+    });
+    
     applySettings();
   </script>
 </body>
