@@ -455,7 +455,11 @@
         document.getElementById("matrixLeft").value = 72;
       }
     
-      generateLabels();
+      if (document.getElementById("codesInput").value.trim().length > 0) {
+        generateLabels();
+      } else {
+        applySettings();
+      }
     }
 
     function generateLabels() {
